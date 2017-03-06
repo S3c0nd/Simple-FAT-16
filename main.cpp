@@ -373,7 +373,7 @@ int del(char * filename,int SuperDirClu)
 		if (!strcmp((char *)tempSub->name,filename))
 			break;
 	}
-	if ((strcmp((char*)tempSub->name,filename))||(tempSub->prop==0x10))
+	if ((strcmp((char*)tempSub->name,filename)))
 	{
 		printf("Director does not exist!\n");
 	}else
@@ -381,13 +381,11 @@ int del(char * filename,int SuperDirClu)
 		int temp;
 		((unsigned char *)tempSub)[0]=0xe5;
 		int fileclu=tempSub->firstclu[0]+tempSub->firstclu[1]*256;
-		do
-		{
+
 			temp=fileclu;
 			FAT1[fileclu*2]=0;
 			FAT1[fileclu*2+1]=0;
 			fileclu=FAT1[temp*2]+FAT1[temp*2+1]*256;
-		}while(fileclu!=0xffff);
 	}
 	return 0;
 }
@@ -398,9 +396,10 @@ int dir()
 	int dir_i;
 	for(dir_i=0;dir_i<32;dir_i++)
 	{
-		printf("%s",(PresentAdd+dir_i)->name);
+		if((PresentAdd+dir_i)->name[0]!=0xe5)
+		printf("%s ",(PresentAdd+dir_i)->name);
 	}
-	
+	printf("\n");
 	return 0;
 }
 
@@ -443,6 +442,12 @@ int main()
 				scanf("%s%s",fcnt,fname);
 				writef(fname,(unsigned char *)fcnt,strlen(fcnt)+1,PresentDirClu);				
 			}
+			if (!strcmp(order,"del"))
+			{
+				char fname[20];
+				scanf("%s",fname);
+				del(fname,PresentDirClu);				
+			}
 			if (!strcmp(order,"exit"))
 			{
 				fopen("filesystem.disk","w");
@@ -455,3 +460,4 @@ int main()
 
 	return 0;
 }
+
